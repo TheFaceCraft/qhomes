@@ -35,6 +35,13 @@ jobs:
           CI: false # Prevents treating warnings as errors
           GENERATE_SOURCEMAP: false # Reduces build size
           
+      - name: Verify build output
+        run: |
+          echo "Checking build directory..."
+          ls -la ./frontend/build/
+          echo "Build directory size:"
+          du -sh ./frontend/build/
+          
       - name: Deploy to FTP Server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -43,8 +50,10 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./frontend/build/
           server-dir: /home/u706445394/domains/tfcmockup.com/public_html/qhomesfrontend/
-          dangerous-clean-slate: false # Set to true if you want to delete files not in build
+          dangerous-clean-slate: true # Clean server directory before deploying
+          log-level: verbose
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
+            **/.DS_Store
