@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* QHomes Frontend Styles - Updated 2026-07-01 */
+/* QHomes Frontend - Deployment to root directory */
 html,
 body {
   padding: 0;
