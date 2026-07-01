@@ -49,7 +49,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./frontend/build/
-          server-dir: /home/u706445394/domains/tfcmockup.com/public_html/qhomesfrontend/
+          server-dir: /domains/tfcmockup.com/public_html/qhomesfrontend/
           dangerous-clean-slate: true # Clean server directory before deploying
           log-level: verbose
           exclude: |
