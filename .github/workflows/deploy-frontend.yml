@@ -1,0 +1,50 @@
+name: Deploy Frontend to qhomesfrontend.tfcmockup.com
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  deploy:
+    name: Build and Deploy Frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+        
+      - name: Build React app
+        working-directory: ./frontend
+        run: npm run build
+        env:
+          CI: false # Prevents treating warnings as errors
+          GENERATE_SOURCEMAP: false # Reduces build size
+          
+      - name: Deploy to FTP Server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./frontend/build/
+          server-dir: /home/u706445394/domains/tfcmockup.com/public_html/qhomesfrontend/
+          dangerous-clean-slate: false # Set to true if you want to delete files not in build
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
