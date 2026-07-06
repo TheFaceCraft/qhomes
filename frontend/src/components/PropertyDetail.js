@@ -9,6 +9,7 @@ const PropertyDetail = () => {
     const [error, setError] = useState(null);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
+    const [contactModalOpen, setContactModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchProperty = async () => {
@@ -61,6 +62,16 @@ const PropertyDetail = () => {
         setLightboxOpen(false);
         setLightboxImageIndex(0);
         document.body.style.overflow = 'unset'; // Restore scrolling
+    };
+
+    const openContactModal = () => {
+        setContactModalOpen(true);
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeContactModal = () => {
+        setContactModalOpen(false);
+        document.body.style.overflow = 'unset';
     };
 
     // Memoize images to prevent unnecessary re-renders
@@ -121,6 +132,23 @@ const PropertyDetail = () => {
             document.removeEventListener('keydown', handleKeydown);
         };
     }, [lightboxOpen, nextLightboxImage, prevLightboxImage]);
+
+    // Close contact modal on Escape key
+    useEffect(() => {
+        const handleKeydown = (e) => {
+            if (e.key === 'Escape' && contactModalOpen) {
+                closeContactModal();
+            }
+        };
+
+        if (contactModalOpen) {
+            document.addEventListener('keydown', handleKeydown);
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleKeydown);
+        };
+    }, [contactModalOpen]);
 
     if (loading) {
         return (
@@ -307,6 +335,106 @@ const PropertyDetail = () => {
                     </div>
                 )}
 
+                {/* Contact Agent Modal */}
+                {contactModalOpen && property?.agent && (
+                    <div 
+                        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+                        style={{ 
+                            zIndex: 99999,
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100vw',
+                            height: '100vh'
+                        }}
+                        onClick={closeContactModal}
+                    >
+                        <div 
+                            className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Close button */}
+                            <button
+                                onClick={closeContactModal}
+                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+                                style={{ position: 'absolute', top: '1rem', right: '1rem' }}
+                            >
+                                ×
+                            </button>
+
+                            {/* Modal Header */}
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Contact Agent</h2>
+
+                            {/* Agent Info */}
+                            <div className="text-center mb-6">
+                                <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+                                    {property.agent.avatar ? (
+                                        <OptimizedImage
+                                            src={property.agent.avatar}
+                                            alt={property.agent.name}
+                                            className="w-24 h-24 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-4xl text-gray-500">👤</span>
+                                    )}
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                    {property.agent.name}
+                                </h3>
+                                {property.agent.company && (
+                                    <p className="text-gray-600 mb-4">{property.agent.company}</p>
+                                )}
+                            </div>
+
+                            {/* Contact Details */}
+                            <div className="space-y-4 mb-6">
+                                {property.agent.phone && (
+                                    <div className="flex items-center justify-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                        <span className="text-xl">📞</span>
+                                        <div className="text-left">
+                                            <p className="text-xs text-gray-500">Phone</p>
+                                            <a href={`tel:${property.agent.phone}`} className="text-blue-600 hover:underline font-medium">
+                                                {property.agent.phone}
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
+                                {property.agent.email && (
+                                    <div className="flex items-center justify-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                        <span className="text-xl">✉️</span>
+                                        <div className="text-left">
+                                            <p className="text-xs text-gray-500">Email</p>
+                                            <a href={`mailto:${property.agent.email}`} className="text-blue-600 hover:underline font-medium break-all">
+                                                {property.agent.email}
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="space-y-3">
+                                {property.agent.phone && (
+                                    <a 
+                                        href={`tel:${property.agent.phone}`}
+                                        className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 text-center font-semibold"
+                                    >
+                                        Call Now
+                                    </a>
+                                )}
+                                {property.agent.email && (
+                                    <a 
+                                        href={`mailto:${property.agent.email}?subject=Inquiry about ${property.title}`}
+                                        className="block w-full border-2 border-blue-600 text-blue-600 py-3 px-4 rounded-lg hover:bg-blue-50 transition duration-200 text-center font-semibold"
+                                    >
+                                        Send Email
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Main Content - 2 Columns */}
                 <div className='content-property'>
                 <div class="flex flex-row">
@@ -429,7 +557,10 @@ const PropertyDetail = () => {
   {/* Contact Card */}
                         <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
                             {/* Contact Agent Button */}
-                            <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-semibold">
+                            <button 
+                                onClick={openContactModal}
+                                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-semibold"
+                            >
                                 Contact Agent
                             </button>
                         </div>
