@@ -50,8 +50,9 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm font-medium text-white">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-gray-400">{{ Auth::user()->email }}</p>
                             <p class="text-xs text-gray-300">{{ Auth::user()->role_display }}</p>
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
+                            <form method="POST" action="{{ route('logout') }}" class="inline mt-1">
                                 @csrf
                                 <button type="submit" class="text-xs text-gray-300 hover:text-white">Sign out</button>
                             </form>
@@ -115,8 +116,9 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm font-medium text-white">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-gray-400">{{ Auth::user()->email }}</p>
                             <p class="text-xs text-gray-300">{{ Auth::user()->role_display }}</p>
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
+                            <form method="POST" action="{{ route('logout') }}" class="inline mt-1">
                                 @csrf
                                 <button type="submit" class="text-xs text-gray-300 hover:text-white">Sign out</button>
                             </form>
