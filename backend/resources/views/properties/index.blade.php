@@ -28,12 +28,12 @@
                         <!-- Property Header -->
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ $property->title }}</h3>
-                                <div class="flex items-center space-x-2 text-sm text-gray-600">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-1" style="height:57px;">{{ $property->title }}</h3>
+                                <div class="flex items-center space-x-2 text-sm text-gray-600 mt-3">
+                                    <span class="inline-flex items-center px-2 py-10 my-10 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                         {{ $property->type_display }}
                                     </span>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    <span class="inline-flex items-center px-2 py-10 rounded-full text-xs font-medium 
                                         {{ $property->status == 'for_sale' ? 'bg-green-100 text-green-800' : 
                                            ($property->status == 'for_rent' ? 'bg-yellow-100 text-yellow-800' : 
                                            ($property->status == 'sold' ? 'bg-gray-100 text-gray-800' : 'bg-purple-100 text-purple-800')) }}">

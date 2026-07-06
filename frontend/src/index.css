@@ -2,14 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* QHomes Frontend - Deployment to root directory */
+/* Simple CSS without Tailwind for now */
 html,
 body {
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-   
 }
 
 

@@ -16,13 +16,21 @@ class SuperAdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'Please login to access this page.');
+            abort(403, 'Access denied. Authentication required.');
         }
 
-        if (!auth()->user()->isSuperAdmin()) {
-            abort(403, 'Access denied. Super admin privileges required.');
+        $user = auth()->user();
+        
+        // Allow system super admin full access
+        if ($user->isSystemSuperAdmin()) {
+            return $next($request);
+        }
+        
+        // For company user routes (like agents), allow company users
+        if ($user->isCompanyUser()) {
+            return $next($request);
         }
 
-        return $next($request);
+        abort(403, 'Access denied. This action requires admin privileges.');
     }
 }

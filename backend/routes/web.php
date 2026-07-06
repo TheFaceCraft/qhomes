@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\CompanyUserController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
@@ -135,6 +136,7 @@ Route::middleware('auth')->group(function () {
 
     // Super admin only routes
     Route::middleware('super_admin')->group(function () {
+        // Agent management
         Route::resource('agents', AgentController::class);
         Route::post('agents/{agent}/create-user-account', [AgentController::class, 'createUserAccount'])
             ->name('agents.create-user-account');
@@ -144,6 +146,17 @@ Route::middleware('auth')->group(function () {
             ->name('agents.reset-password');
         Route::patch('agents/{agent}/update-permissions', [AgentController::class, 'updatePermissions'])
             ->name('agents.update-permissions');
+            
+        // Company user management (System Super Admin only)
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::get('/company-users', [CompanyUserController::class, 'index'])->name('company-users.index');
+            Route::get('/company-users/create', [CompanyUserController::class, 'create'])->name('company-users.create');
+            Route::post('/company-users', [CompanyUserController::class, 'store'])->name('company-users.store');
+            Route::get('/company-users/{companyUser}', [CompanyUserController::class, 'show'])->name('company-users.show');
+            Route::post('/company-users/{companyUser}/activate', [CompanyUserController::class, 'activate'])->name('company-users.activate');
+            Route::post('/company-users/{companyUser}/deactivate', [CompanyUserController::class, 'deactivate'])->name('company-users.deactivate');
+            Route::get('/stats', [CompanyUserController::class, 'stats'])->name('stats');
+        });
     });
 });
 

@@ -16,7 +16,23 @@ class AgentController extends Controller
      */
     public function index()
     {
-        $agents = Agent::orderBy('created_at', 'desc')->paginate(10);
+        $user = auth()->user();
+        
+        // Filter agents based on user role
+        if ($user->isCompanyUser()) {
+            // Company users can only see their own agents
+            $agents = Agent::where('created_by', $user->name)
+                          ->orderBy('created_at', 'desc')
+                          ->paginate(10);
+        } elseif ($user->isAgent()) {
+            // Agents should not see any agents (or only themselves if needed)
+            // For now, show empty collection
+            $agents = Agent::where('id', 0)->paginate(10); // Empty result
+        } else {
+            // Fallback (should not happen with current role system)
+            $agents = Agent::orderBy('created_at', 'desc')->paginate(10);
+        }
+        
         return view('agents.index', compact('agents'));
     }
 
@@ -303,7 +319,7 @@ class AgentController extends Controller
 
         $permissionIds = $validated['permissions'] ?? [];
         
-        // Remove agent-related permissions as they should only be for super admins
+        // Remove agent-related permissions as they should only be for company users
         $agentPermissions = \App\Models\Permission::where('category', 'agents')->pluck('id')->toArray();
         $permissionIds = array_diff($permissionIds, $agentPermissions);
 

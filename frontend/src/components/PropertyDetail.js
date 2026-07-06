@@ -426,76 +426,12 @@ const PropertyDetail = () => {
                         
   </div>
   <div class="basis-1/3">
-  {/* Price & Booking Card */}
+  {/* Contact Card */}
                         <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                            {/* Price */}
-                            <div className="mb-4">
-                                <div className="text-[18px] roboto font-bold text-blue-600 mb-1">
-                                    {property.display_price || formatPrice(property.price, property.currency)}
-                                </div>
-                                <p className="text-gray-600 roboto text-[14px]">
-                                    {property.status === 'for_rent' ? 'per month' : 'total price'}
-                                </p>
-                            </div>
-
-                            {/* Check-in & Check-out Calendar */}
-                            <div className="space-y-4 mb-6">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block roboto text-[14px] text-gray-700 mb-0">
-                                            Check-in
-                                        </label>
-                                        <input 
-                                            type="date" 
-                                            className="w-full border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block roboto text-[14px] text-gray-700 mb-0">
-                                            Check-out
-                                        </label>
-                                        <input 
-                                            type="date" 
-                                            className="w-full border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label className="block roboto text-[14px] text-gray-700 mb-0">
-                                        Guests
-                                    </label>
-                                    <select className="w-full border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <option value="1">1 guest</option>
-                                        <option value="2">2 guests</option>
-                                        <option value="3">3 guests</option>
-                                        <option value="4">4 guests</option>
-                                        <option value="5">5+ guests</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Reserve Button */}
-                            <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-semibold mb-4">
-                                Reserve Now
+                            {/* Contact Agent Button */}
+                            <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-semibold">
+                                Contact Agent
                             </button>
-
-                            {/* Additional Info */}
-                            <div className="space-y-2 text-sm text-gray-600">
-                                <div className="flex justify-between">
-                                    <span>Cleaning fee</span>
-                                    <span>$50</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Service fee</span>
-                                    <span>$25</span>
-                                </div>
-                                <hr className="my-3" />
-                                <div className="flex justify-between font-semibold text-gray-900">
-                                    <span>Total</span>
-                                    <span>{property.display_price || formatPrice((property.price || 0) + 75, property.currency)}</span>
-                                </div>
-                            </div>
                         </div>
   </div>
 </div>

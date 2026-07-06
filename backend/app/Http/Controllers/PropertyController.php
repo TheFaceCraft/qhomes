@@ -18,14 +18,19 @@ class PropertyController extends Controller
      */
     public function index(): View
     {
-        $query = Property::query();
+        $user = Auth::user();
         
-        // Super admin can see all properties, agents can only see their own
-        if (Auth::user()->isAgent()) {
-            $query->where('user_id', Auth::id());
+        // Company users can see their own properties and their agents' properties
+        if ($user->isCompanyUser()) {
+            $accessiblePropertiesQuery = $user->accessible_properties;
+            $properties = $accessiblePropertiesQuery->orderBy('created_at', 'desc')->paginate(12);
+        } elseif ($user->isAgent()) {
+            // Agents can only see their own properties
+            $properties = Property::where('user_id', $user->id)->orderBy('created_at', 'desc')->paginate(12);
+        } else {
+            // No access for other roles
+            $properties = Property::where('id', null)->paginate(12);
         }
-        
-        $properties = $query->orderBy('created_at', 'desc')->paginate(12);
 
         return view('properties.index', compact('properties'));
     }

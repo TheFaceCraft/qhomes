@@ -12,6 +12,7 @@ class Property extends Model
 
     protected $fillable = [
         'user_id',
+        'agent_id',
         'title',
         'type',
         'status',
@@ -59,6 +60,11 @@ class Property extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function agent(): BelongsTo
+    {
+        return $this->belongsTo(Agent::class);
     }
 
     public function getFormattedPriceAttribute(): string

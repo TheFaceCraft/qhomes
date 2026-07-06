@@ -25,6 +25,7 @@ class User extends Authenticatable
         'role',
         'agent_id',
         'is_active',
+        'status',
     ];
 
     /**
@@ -56,7 +57,68 @@ class User extends Authenticatable
      */
     public function agent()
     {
-        return $this->belongsTo(Agent::class);
+        return $this->belongsTo(\App\Models\Agent::class);
+    }
+
+    /**
+     * Get the properties owned by this user (for company users).
+     */
+    public function properties()
+    {
+        return $this->hasMany(\App\Models\Property::class);
+    }
+
+    /**
+     * Get all agents that belong to this company user.
+     */
+    public function companyAgents()
+    {
+        // For company users, return a relationship
+        if ($this->isCompanyUser()) {
+            return $this->hasMany(\App\Models\Agent::class, 'created_by', 'name');
+        }
+        
+        // Return empty relationship for other roles
+        return $this->hasMany(\App\Models\Agent::class, 'created_by', 'name')->whereNull('created_by');
+    }
+
+    /**
+     * Get all properties accessible by this user based on role and business logic.
+     */
+    public function getAccessiblePropertiesAttribute()
+    {
+        return $this->accessible_properties()->get();
+    }
+
+    /**
+     * Get query for all properties accessible by this user based on role and business logic.
+     */
+    public function accessible_properties()
+    {
+        if ($this->isCompanyUser()) {
+            // Company users can see their own properties and properties added by their agents
+            $agentUserIds = [];
+            
+            // Get agents created by this company user that have user accounts
+            $agents = $this->companyAgents()->get();
+            foreach ($agents as $agent) {
+                if ($agent->hasUserAccount()) {
+                    $agentUserIds[] = $agent->user->id;
+                }
+            }
+            
+            return \App\Models\Property::where(function($query) use ($agentUserIds) {
+                $query->where('user_id', $this->id); // Own properties
+                if (!empty($agentUserIds)) {
+                    $query->orWhereIn('user_id', $agentUserIds); // Agent properties
+                }
+            });
+        } elseif ($this->isAgent()) {
+            // Agents can only see their own properties
+            return \App\Models\Property::where('user_id', $this->id);
+        }
+        
+        return \App\Models\Property::where('id', null); // No access
     }
 
     /**
@@ -72,8 +134,8 @@ class User extends Authenticatable
      */
     public function hasPermission(string $permission): bool
     {
-        // Super admins have all permissions
-        if ($this->isSuperAdmin()) {
+        // Company users have all permissions (like super admins)
+        if ($this->isCompanyUser()) {
             return true;
         }
 
@@ -85,8 +147,8 @@ class User extends Authenticatable
      */
     public function hasAnyPermission(array $permissions): bool
     {
-        // Super admins have all permissions
-        if ($this->isSuperAdmin()) {
+        // Company users have all permissions (like super admins)
+        if ($this->isCompanyUser()) {
             return true;
         }
 
@@ -102,11 +164,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is a super admin.
+     * Check if user is a company user.
      */
-    public function isSuperAdmin(): bool
+    public function isCompanyUser(): bool
     {
-        return $this->role === 'super_admin';
+        return $this->role === 'company_user';
     }
 
     /**
@@ -118,12 +180,71 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user is a super admin (deprecated - use isCompanyUser instead).
+     * @deprecated Use isCompanyUser() instead
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    /**
+     * Check if user is the system super admin with full access.
+     */
+    public function isSystemSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    /**
+     * Check if user is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * Activate the user.
+     */
+    public function activate(): void
+    {
+        $this->update(['status' => 'active']);
+    }
+
+    /**
+     * Deactivate the user.
+     */
+    public function deactivate(): void
+    {
+        $this->update(['status' => 'inactive']);
+    }
+
+    /**
+     * Ensure only one super admin exists.
+     */
+    public static function ensureSingleSuperAdmin(): bool
+    {
+        $superAdminCount = self::where('role', 'super_admin')->count();
+        return $superAdminCount <= 1;
+    }
+
+    /**
+     * Check if super admin already exists.
+     */
+    public static function superAdminExists(): bool
+    {
+        return self::where('role', 'super_admin')->exists();
+    }
+
+    /**
      * Get role display name.
      */
     public function getRoleDisplayAttribute(): string
     {
         return match($this->role) {
-            'super_admin' => 'Super Admin',
+            'super_admin' => 'System Super Admin',
+            'company_user' => 'Company User',
             'agent' => 'Agent',
             default => 'Unknown'
         };
