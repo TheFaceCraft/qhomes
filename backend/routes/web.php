@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * QHomes Application Routes
+ * Updated: 2026-07-06
+ */
+
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\CompanyUserController;
 use App\Http\Controllers\ListingController;
