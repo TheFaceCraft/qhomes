@@ -22,8 +22,7 @@ class PropertyController extends Controller
         
         // Company users can see their own properties and their agents' properties
         if ($user->isCompanyUser()) {
-            $accessiblePropertiesQuery = $user->accessible_properties;
-            $properties = $accessiblePropertiesQuery->orderBy('created_at', 'desc')->paginate(12);
+            $properties = $user->accessible_properties()->orderBy('created_at', 'desc')->paginate(12);
         } elseif ($user->isAgent()) {
             // Agents can only see their own properties
             $properties = Property::where('user_id', $user->id)->orderBy('created_at', 'desc')->paginate(12);
