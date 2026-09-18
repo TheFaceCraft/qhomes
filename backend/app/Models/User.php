@@ -87,13 +87,18 @@ class User extends Authenticatable
      */
     public function getAccessiblePropertiesAttribute()
     {
-        return $this->accessible_properties()->get();
+        return $this->accessiblePropertiesQuery()->get();
     }
 
     /**
      * Get query for all properties accessible by this user based on role and business logic.
      */
     public function accessible_properties()
+    {
+        return $this->accessiblePropertiesQuery();
+    }
+
+    public function accessiblePropertiesQuery()
     {
         if ($this->isCompanyUser()) {
             // Company users can see their own properties and properties added by their agents

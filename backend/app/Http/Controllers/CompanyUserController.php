@@ -80,14 +80,14 @@ class CompanyUserController extends Controller
         // Get statistics for this company user
         $stats = [
             'agents' => $companyUser->companyAgents()->count(),
-            'properties' => $companyUser->accessible_properties()->count(),
-            'active_properties' => $companyUser->accessible_properties()
+            'properties' => $companyUser->accessiblePropertiesQuery()->count(),
+            'active_properties' => $companyUser->accessiblePropertiesQuery()
                 ->where('status', 'active')
                 ->count(),
         ];
 
         // Get recent properties (last 10)
-        $recentProperties = $companyUser->accessible_properties()
+        $recentProperties = $companyUser->accessiblePropertiesQuery()
             ->with('user')
             ->orderBy('created_at', 'desc')
             ->take(10)
